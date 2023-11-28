@@ -3,6 +3,7 @@
 to execute on command line: mysql -u root -p company 
 then enter password 
 */
+
 drop database if exists coffeeShop;
 create database coffeeShop;
 use coffeeShop;
@@ -31,7 +32,7 @@ CREATE TABLE Employees (
 	Name VARCHAR(100) NOT NULL,
 	Position VARCHAR(100),
 	HireDate DATE,
-	email VARCHAR(100),
+	Email VARCHAR(100),
 	Phone VARCHAR(8),
 	PhoneAreaCode VARCHAR(3),
   	Ssn CHAR(9) NOT NULL,

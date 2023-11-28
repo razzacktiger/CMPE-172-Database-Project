@@ -23,7 +23,7 @@ FROM Inventory;
 
 -- 4. Employee Contact Information
 -- Useful for quickly accessing employee contact information.
-SELECT Name, Position, email, CONCAT(PhoneAreaCode, '-', Phone) AS Phone
+SELECT Name, Position, Email, CONCAT(PhoneAreaCode, '-', Phone) AS Phone
 FROM Employees;
 
 -- 5. Daily Sales Total
