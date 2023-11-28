@@ -54,11 +54,11 @@ GROUP BY MenuItems.Name;
 SELECT Employees.Name, EmployeeSchedules.WorkDate, EmployeeSchedules.StartTime, EmployeeSchedules.EndTime 
 FROM EmployeeSchedules 
 JOIN Employees ON EmployeeSchedules.EmployeeID = Employees.EmployeeID 
-WHERE EmployeeSchedules.WorkDate BETWEEN '2023-01-01' AND '2023-01-07';
+WHERE EmployeeSchedules.WorkDate BETWEEN '2021-01-01' AND '2021-01-07';
 
 -- 9. Inventory Reorder List
 -- Identifies ingredients with low stock.
-SELECT Name 
+SELECT Name as LowSockItem, Quantity
 FROM Inventory 
 WHERE Quantity < 50;
 
@@ -94,6 +94,7 @@ SELECT Employees.Name, COUNT(Orders.OrderID) AS OrdersHandled
 FROM Employees 
 JOIN EmployeeSchedules ON Employees.EmployeeID = EmployeeSchedules.EmployeeID 
 JOIN Orders ON EmployeeSchedules.WorkDate = Orders.Date 
+AND Orders.Time BETWEEN EmployeeSchedules.StartTime AND EmployeeSchedules.EndTime
 GROUP BY Employees.Name;
 
 -- 14. Ingredient Usage Forecast
@@ -140,12 +141,12 @@ RIGHT JOIN EmployeeSchedules ON Employees.EmployeeID = EmployeeSchedules.Employe
 WHERE Employees.Name IS NULL;
 
 -- 19. Full Overview of Customers and Orders
--- Lists all customers and orders, including customers who have not placed any orders yet.
-SELECT Customers.Name AS CustomerName, Orders.Date AS OrderDate
+-- Lists all customers, their order dates and total amount spent, including customers who have not placed any orders yet.
+SELECT Customers.Name AS CustomerName, Orders.Date AS OrderDate, Orders.TotalAmount 
 FROM Customers
 LEFT JOIN Orders ON Customers.CustomerID = Orders.CustomerID
 UNION
-SELECT Customers.Name AS CustomerName, Orders.Date AS OrderDate
+SELECT Customers.Name AS CustomerName, Orders.Date AS OrderDate, Orders.TotalAmount
 FROM Customers
 RIGHT JOIN Orders ON Customers.CustomerID = Orders.CustomerID;
 
