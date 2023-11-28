@@ -1,78 +1,157 @@
+-- Coffee Shop Database Queries
+
 -- Basic Queries
 
--- List All Products and Prices
-SELECT Name, Price FROM Products;
+-- 1. Monthly Sales Report
+-- This query calculates the total sales for each month.
+SELECT MONTH(Date) AS Month, SUM(TotalAmount) AS TotalSales 
+FROM Orders 
+GROUP BY MONTH(Date);
 
--- Total Number of Orders for Each Customer
-SELECT CustomerID, COUNT(*) as TotalOrders FROM Orders GROUP BY CustomerID;
+-- 2. Top Selling Menu Items
+-- Identifies the most popular menu items based on sales quantity.
+SELECT MenuItems.Name, SUM(OrderDetails.Quantity) AS TotalSold 
+FROM OrderDetails 
+JOIN MenuItems ON OrderDetails.MenuItemID = MenuItems.MenuItemID 
+GROUP BY MenuItems.Name 
+ORDER BY TotalSold DESC;
 
--- Daily Sales Total
-SELECT Date, SUM(TotalAmount) as DailySales FROM Orders GROUP BY Date;
+-- 3. Current Inventory Levels
+-- Provides a quick view of current stock levels for each ingredient.
+SELECT Name, Quantity 
+FROM Inventory;
 
--- Inventory Status for Each Product
-SELECT P.Name, I.Quantity FROM Inventory I JOIN Products P ON I.ProductID = P.ProductID;
+-- 4. Employee Contact Information
+-- Useful for quickly accessing employee contact information.
+SELECT Name, Position 
+FROM Employees;
 
--- Employee Roster
-SELECT Name, Position FROM Employees;
+-- 5. Daily Sales Total
+-- Shows the total sales for each day.
+SELECT DATE(Date) AS SalesDate, SUM(TotalAmount) AS DailyTotal 
+FROM Orders 
+GROUP BY SalesDate;
 
 -- Intermediate Queries
 
--- Monthly Sales by Product Category
-SELECT MONTH(O.Date) as Month, P.Category, SUM(OD.Subtotal) as Sales 
-FROM Orders O 
-JOIN OrderDetails OD ON O.OrderID = OD.OrderID 
-JOIN Products P ON OD.ProductID = P.ProductID 
-GROUP BY MONTH(O.Date), P.Category;
+-- 6. Sales by Menu Item per Month
+-- Breaks down monthly sales by each menu item.
+SELECT MenuItems.Name, MONTH(Orders.Date) AS Month, SUM(OrderDetails.Quantity) AS QuantitySold 
+FROM OrderDetails 
+JOIN Orders ON OrderDetails.OrderID = Orders.OrderID 
+JOIN MenuItems ON OrderDetails.MenuItemID = MenuItems.MenuItemID 
+GROUP BY Month, MenuItems.Name;
 
--- Average Order Value
-SELECT AVG(TotalAmount) FROM Orders;
+-- 7. Inventory Usage per Menu Item
+-- Tracks how much of each menu item is sold.
+SELECT MenuItems.Name, SUM(OrderDetails.Quantity) AS TotalUsed 
+FROM OrderDetails 
+JOIN MenuItems ON OrderDetails.MenuItemID = MenuItems.MenuItemID 
+GROUP BY MenuItems.Name;
 
--- Top 5 Selling Products
-SELECT P.Name, SUM(OD.Quantity) as TotalSold 
-FROM OrderDetails OD 
-JOIN Products P ON OD.ProductID = P.ProductID 
-GROUP BY P.ProductID 
-ORDER BY TotalSold DESC LIMIT 5;
+-- 8. Employee Shifts for the Week
+-- Lists employee shifts for a specific week.
+SELECT Employees.Name, EmployeeSchedules.WorkDate, EmployeeSchedules.StartTime, EmployeeSchedules.EndTime 
+FROM EmployeeSchedules 
+JOIN Employees ON EmployeeSchedules.EmployeeID = Employees.EmployeeID 
+WHERE EmployeeSchedules.WorkDate BETWEEN '2023-01-01' AND '2023-01-07';
 
--- Customer Order History
-SELECT C.Name, O.OrderID, O.Date, O.TotalAmount 
-FROM Customers C 
-JOIN Orders O ON C.CustomerID = O.CustomerID;
+-- 9. Inventory Reorder List
+-- Identifies ingredients with low stock.
+SELECT Name 
+FROM Inventory 
+WHERE Quantity < 50;
 
--- Product Reorder List
-SELECT P.Name, I.Quantity 
-FROM Inventory I 
-JOIN Products P ON I.ProductID = P.ProductID 
-WHERE I.Quantity < 10;
+-- 10. Customer Order History
+-- Provides a history of orders for each customer.
+SELECT Customers.Name, Orders.Date, SUM(Orders.TotalAmount) AS TotalSpent 
+FROM Orders 
+JOIN Customers ON Orders.CustomerID = Customers.CustomerID 
+GROUP BY Customers.Name, Orders.Date;
 
 -- Advanced Queries
 
--- Yearly Sales Comparison by Month
-SELECT YEAR(Date) as Year, MONTH(Date) as Month, SUM(TotalAmount) as MonthlySales 
+-- 11. Monthly Sales Comparison by Year
+-- Compares monthly sales across different years.
+SELECT YEAR(Date) AS Year, MONTH(Date) AS Month, SUM(TotalAmount) AS MonthlySales 
 FROM Orders 
 GROUP BY YEAR(Date), MONTH(Date);
 
--- Customer Lifetime Value
-SELECT C.CustomerID, C.Name, SUM(O.TotalAmount) as LifetimeValue 
-FROM Customers C 
-JOIN Orders O ON C.CustomerID = O.CustomerID 
-GROUP BY C.CustomerID;
+-- 12. Detailed Inventory Status
+-- Provides a detailed view of inventory, including supplier information.
+SELECT Inventory.Name, Inventory.Quantity, Suppliers.Name AS Supplier 
+FROM Inventory 
+JOIN Suppliers ON Inventory.SupplierID = Suppliers.SupplierID;
 
--- Supplier Reliability
-SELECT S.Name, COUNT(I.SupplierID) as TotalDeliveries, AVG(I.Quantity) as AvgQuantity 
-FROM Suppliers S 
-JOIN Inventory I ON S.SupplierID = I.SupplierID 
-GROUP BY S.SupplierID;
+-- 13. Employee Performance (Based on Orders Handled)
+-- Note: This query assumes that each employee works one shift per day
+-- If an employee works multiple shifts in a day, the query will return incorrect results
+-- To fix this, we would need to add a GROUP BY clause to the EmployeeSchedules table
+-- and SUM the total hours worked per day for each employee
+-- Assesses employee performance based on the number of orders handled.
 
--- Employee Efficiency (Orders Handled)
--- Note: This query assumes a link between employees and orders in the database schema.
-SELECT E.Name, COUNT(O.OrderID) as OrdersHandled 
-FROM Employees E 
-JOIN Orders O ON E.EmployeeID = O.EmployeeID 
-GROUP BY E.EmployeeID;
+SELECT Employees.Name, COUNT(Orders.OrderID) AS OrdersHandled 
+FROM Employees 
+JOIN EmployeeSchedules ON Employees.EmployeeID = EmployeeSchedules.EmployeeID 
+JOIN Orders ON EmployeeSchedules.WorkDate = Orders.Date 
+GROUP BY Employees.Name;
 
--- Sales Trend Analysis
-SELECT ProductID, YEAR(Date) as Year, MONTH(Date) as Month, SUM(Quantity) as TotalQuantitySold 
-FROM Orders O 
-JOIN OrderDetails OD ON O.OrderID = OD.OrderID 
-GROUP BY ProductID, YEAR(Date), MONTH(Date);
+-- 14. Ingredient Usage Forecast
+-- Calculates the average monthly usage for each ingredient.
+SELECT Inventory.Name, SUM(OrderDetails.Quantity) / COUNT(DISTINCT MONTH(Orders.Date)) AS AvgMonthlyUsage 
+FROM OrderDetails 
+JOIN MenuItems ON OrderDetails.MenuItemID = MenuItems.MenuItemID 
+JOIN MenuItemIngredients ON MenuItems.MenuItemID = MenuItemIngredients.MenuItemID 
+JOIN Inventory ON MenuItemIngredients.InventoryID = Inventory.InventoryID 
+JOIN Orders ON OrderDetails.OrderID = Orders.OrderID 
+GROUP BY Inventory.Name;
+
+-- 15. Profit Margin Analysis
+-- Calculates the profit margin for each menu item.
+SELECT MenuItems.Name, MenuItems.Price - 
+(SELECT SUM(Inventory.Cost) 
+FROM Inventory 
+JOIN MenuItemIngredients ON Inventory.InventoryID = MenuItemIngredients.InventoryID 
+WHERE MenuItemIngredients.MenuItemID = MenuItems.MenuItemID) 
+AS ProfitMargin 
+FROM MenuItems;
+
+
+-- Additional Queries with Various Joins
+
+-- 16. Supplier and Inventory Details
+-- Lists all ingredients and their suppliers.
+SELECT Inventory.Name AS InventoryItem, Suppliers.Name AS SupplierName, Suppliers.Contact
+FROM Inventory
+INNER JOIN Suppliers ON Inventory.SupplierID = Suppliers.SupplierID;
+
+-- 17. Menu Items Without Orders
+-- Lists menu items that have not been ordered yet.
+SELECT MenuItems.Name
+FROM MenuItems
+LEFT JOIN OrderDetails ON MenuItems.MenuItemID = OrderDetails.MenuItemID
+WHERE OrderDetails.OrderID IS NULL;
+
+-- 18. Employee Schedule with Unassigned Shifts
+-- Lists employee shifts that have not been assigned to an employee.
+SELECT Employees.Name, EmployeeSchedules.WorkDate, EmployeeSchedules.StartTime, EmployeeSchedules.EndTime
+FROM Employees
+RIGHT JOIN EmployeeSchedules ON Employees.EmployeeID = EmployeeSchedules.EmployeeID
+WHERE Employees.Name IS NULL;
+
+-- 19. Full Overview of Customers and Orders
+-- Lists all customers and orders, including customers who have not placed any orders yet.
+SELECT Customers.Name AS CustomerName, Orders.Date AS OrderDate
+FROM Customers
+LEFT JOIN Orders ON Customers.CustomerID = Orders.CustomerID
+UNION
+SELECT Customers.Name AS CustomerName, Orders.Date AS OrderDate
+FROM Customers
+RIGHT JOIN Orders ON Customers.CustomerID = Orders.CustomerID;
+
+-- 20. Natural Join on Orders and Customers
+-- Lists all orders and customers, including customers who have not placed any orders yet.
+SELECT *
+FROM Orders
+NATURAL JOIN Customers;
+
