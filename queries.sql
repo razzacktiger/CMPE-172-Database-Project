@@ -56,7 +56,7 @@ GROUP BY Month, MenuItems.Name;
 
 -- 9. Inventory Usage per Menu Item
 -- Tracks how much of each menu item is sold.
-SELECT MenuItems.Name, SUM(OrderDetails.Quantity) AS TotalUsed 
+SELECT MenuItems.Name, SUM(OrderDetails.Quantity) AS TotalSold
 FROM OrderDetails 
 JOIN MenuItems ON OrderDetails.MenuItemID = MenuItems.MenuItemID 
 GROUP BY MenuItems.Name;
@@ -70,7 +70,7 @@ WHERE EmployeeSchedules.WorkDate BETWEEN '2021-01-01' AND '2021-01-07';
 
 -- 11. Inventory Reorder List
 -- Identifies ingredients with low stock.
-SELECT Name as LowSockItem, Quantity
+SELECT Name as LowStockItem, Quantity
 FROM Inventory 
 WHERE Quantity < 50;
 
