@@ -18,7 +18,7 @@ ORDER BY TotalSold DESC;
 
 -- 3. Current Inventory Levels
 -- Provides a quick view of current stock levels for each ingredient.
-SELECT Name, Quantity 
+SELECT Name, Quantity as QuantityInPackets
 FROM Inventory;
 
 -- 4. Employee Contact Information
