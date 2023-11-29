@@ -37,9 +37,13 @@ UPDATE Customers
 SET Email = 'newemail@example.com', Phone = '1234567', PhoneAreaCode = '408'
 WHERE CustomerID = 1; -- Replace with the actual CustomerID
 
+SELECT * FROM Customers;
+
 -- 7. Add a new column to indicate if a customer is part of the loyalty program
 ALTER TABLE Customers
 ADD COLUMN IsLoyaltyMember BOOLEAN DEFAULT FALSE;
+
+SELECT * FROM Customers;
 
 -- Intermediate Queries
 
