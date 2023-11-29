@@ -1,6 +1,8 @@
 use coffeeShop;
 -- queries for coffeeShop
 
+-- Basic Queries
+
 -- 1. Inventory Reorder List
 -- ingredients with low stock.
 SELECT Name as LowStockItem, Quantity
@@ -29,6 +31,8 @@ ALTER TABLE Customers
 ADD COLUMN IsLoyaltyMember BOOLEAN DEFAULT FALSE;
 
 SELECT * FROM Customers;
+
+-- Intermediate Queries
 
 -- 6. Monthly Sales Report
 -- This query calculates the total sales for each month.
@@ -115,6 +119,8 @@ SELECT Employees.Name, EmployeeSchedules.WorkDate, EmployeeSchedules.StartTime, 
 FROM Employees
 RIGHT JOIN EmployeeSchedules ON Employees.EmployeeID = EmployeeSchedules.EmployeeID
 WHERE Employees.Name IS NULL;
+
+-- Advanced Queries
 
 -- 19. Sales by Menu Item per Month
 -- Breaks down monthly sales by each menu item.
