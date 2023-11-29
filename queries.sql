@@ -170,7 +170,7 @@ FROM Customers
 RIGHT JOIN Orders ON Customers.CustomerID = Orders.CustomerID;
 
 -- 24. Overview of ingredients used in each menu item
--- SELECT MenuItems.Name, Inventory.Name AS Ingredient 
+SELECT MenuItems.Name, Inventory.Name AS Ingredient 
 FROM MenuItemIngredients
 JOIN MenuItems ON MenuItemIngredients.MenuItemID = MenuItems.MenuItemID
 JOIN Inventory ON MenuItemIngredients.InventoryID = Inventory.InventoryID
