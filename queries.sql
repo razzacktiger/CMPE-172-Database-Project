@@ -1,3 +1,6 @@
+use coffeeShop;
+-- queries for coffeeShop
+
 -- 1. Inventory Reorder List
 -- ingredients with low stock.
 SELECT Name as LowStockItem, Quantity
